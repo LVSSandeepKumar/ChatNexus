@@ -1,14 +1,28 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { apiClient } from "@/lib/api-client";
 import { getColor } from "@/lib/utils";
 import { useAppStore } from "@/store";
-import { HOST } from "@/utils/constants";
+import { HOST, LOGOUT_ROUTE } from "@/utils/constants";
 import {FiEdit2} from "react-icons/fi";
+import { IoPowerSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 const ProfileInfo = () => {
-  const { userInfo } = useAppStore();
+  const { userInfo, setUserInfo } = useAppStore();
     const navigate = useNavigate();
+
+    const logout = async () => {
+        try {
+            const response = await apiClient.post(LOGOUT_ROUTE, {}, {withCredentials : true});
+            if(response.status === 200) {
+                setUserInfo(null);
+                navigate("/auth");
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
   return (
     <div className="absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]">
@@ -50,6 +64,16 @@ const ProfileInfo = () => {
             </TooltipTrigger>
             <TooltipContent className="bg-[#1c1b1e] text-white border-none"> 
               Edit Profile
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+                <IoPowerSharp className="text-red-500 text-xl font-medium"
+                    onClick={logout}
+                />
+            </TooltipTrigger>
+            <TooltipContent className="bg-[#1c1b1e] text-white border-none"> 
+              Log Out
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
